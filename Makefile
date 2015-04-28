@@ -601,6 +601,8 @@ moc_LcdView.cpp: ../../Qt/5.4/gcc/include/QtWidgets/QDialog \
 		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
+		../../Qt/5.4/gcc/include/QtNetwork/QTcpServer \
+		../../Qt/5.4/gcc/include/QtNetwork/qtcpserver.h \
 		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
 		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
 		../../Qt/5.4/gcc/include/QtWidgets/qframe.h \
@@ -738,6 +740,8 @@ main.o: main.cpp ../../Qt/5.4/gcc/include/QtWidgets/QApplication \
 		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
+		../../Qt/5.4/gcc/include/QtNetwork/QTcpServer \
+		../../Qt/5.4/gcc/include/QtNetwork/qtcpserver.h \
 		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
 		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
 		../../Qt/5.4/gcc/include/QtWidgets/qframe.h
@@ -855,12 +859,13 @@ LcdView.o: LcdView.cpp ../../Qt/5.4/gcc/include/QtCore/QDebug \
 		../../Qt/5.4/gcc/include/QtNetwork/QHostAddress \
 		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
-		../../Qt/5.4/gcc/include/QtWidgets/QVBoxLayout \
 		LcdView.h \
 		../../Qt/5.4/gcc/include/QtWidgets/QDialog \
 		../../Qt/5.4/gcc/include/QtWidgets/qdialog.h \
 		../../Qt/5.4/gcc/include/QtNetwork/QUdpSocket \
 		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
+		../../Qt/5.4/gcc/include/QtNetwork/QTcpServer \
+		../../Qt/5.4/gcc/include/QtNetwork/qtcpserver.h \
 		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
 		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
 		../../Qt/5.4/gcc/include/QtWidgets/qframe.h

@@ -5,6 +5,8 @@
 
 #include <QDialog>
 #include <QUdpSocket>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QLabel>
 #include <QDebug>
 
@@ -31,19 +33,29 @@ class LcdView : public QDialog
 public:
 	LcdView( void );
 	
+public slots:
+	// Udp data recieved slot.
+	void readPendingDatagrams( void );
+	void acceptConnection( void );
+	void recievedLcdCmd( void );
+	void displayError( QAbstractSocket::SocketError socketError );
+	void refreshLcd( void );
+
+signals:
+
 private:
 	QLabel		*m_lcdLabel[2][20];	// LCD•\Ž¦ƒ‰ƒxƒ‹
 	QUdpSocket	*m_udpSocket;
 	QByteArray	m_rcvData;
-	quint8		m_needLength;
-
+	qint64		m_needLength;
+	QTcpServer	*m_TcpServer;
+	QTcpSocket	*m_TcpSocket;
+	
 	// Initalized keyview layout.
 	bool initLayout( void );
 	bool initUdpSocket( void );
+	bool initTcpSocket( void );
 
-public slots:
-	// Udp data recieved slot.
-	void readPendingDatagrams( void );
 };
 
 #endif /* LCD_VIEW_HEADER */

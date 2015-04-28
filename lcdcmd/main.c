@@ -20,8 +20,8 @@
 
 /* Send command data type */
 typedef struct lcdCmd_tag {
+	unsigned char	len;				/* 制御コード＋メッセージの長さ */
 	unsigned char 	code;				/* 制御コード */
-	unsigned char	len;				/* メッセージ長さ */
 	char		str[LCD_LINESTR_LEN + 1];	/* 表示メッセージ */
 } lcdCmd_t;
 
@@ -49,16 +49,8 @@ int main(
 	}
 	
 	/* Set control code */
-#if 0
-	lcdCmd.code = ( ( argv[1][0] == '8' ) ? LCD_LINE_1 : 
-			( argv[1][0] == '9' ) ? LCD_LINE_1 : 
-			( argv[1][0] == 'C' ) ? LCD_LINE_2 : 
-			( argv[1][0] == 'D' ) ? LCD_LINE_2 : LCD_LINE_INVALID );
-	
-	printf( "\x1b[36m Line %d .... ", lcdCmd.code ) ;
-#endif
+	lcdCmd.len = sizeof( lcdCmd.code ) + (argc - 2);	/* 制御コード＋メッセージの長さ */
 	lcdCmd.code = (unsigned char)STRtoHEX( argv[1] );
-	lcdCmd.len = argc - 2;
 	for( i = 2 ; i < argc ; i++ ){
 		lcdCmd.str[i-2] = STRtoHEX( argv[i] );
 		lcdCmd.str[i-1] = 0x00;
@@ -71,17 +63,26 @@ int main(
 	}
 	printf( "\'%s\'\x1b[0m\n", lcdCmd.str );
 
-	/* UDPソケット生成 */
-	sock = socket( AF_INET, SOCK_DGRAM, 0 );
+	/* IPv4 TCP のソケット作成 */
+	if( ( sock = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 ){
+		perror("socket");
+		return -1;
+	}
 
 	/* 送信先アドレス情報生成 */
 	addr.sin_family = AF_INET;			/* IPv4 */
 	addr.sin_port = htons(5001);			/* ポート:5001 */
 	addr.sin_addr.s_addr = inet_addr("127.0.0.1");	/* localhost */
-	
+
+	/* サーバ接続 */
+	connect( sock, ( struct sockaddr * )&addr, sizeof( struct sockaddr_in ) );
+
 	/* LCDコマンド送信 */
-	dataSize = sizeof( lcdCmd.code ) + sizeof( lcdCmd.code ) + lcdCmd.len;
-	sendto( sock, &lcdCmd, dataSize, 0, ( struct sockaddr * )&addr, sizeof( addr ) );
+	dataSize = sizeof( lcdCmd.len ) + lcdCmd.len;
+	if( send( sock, &lcdCmd, dataSize, 0 ) < 0 ) {
+		perror("send");
+		return -1;
+	}
 
 	close( sock );
 
