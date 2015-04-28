@@ -5,6 +5,7 @@
 
 #include <QDialog>
 #include <QUdpSocket>
+#include <QLabel>
 #include <QDebug>
 
 #ifdef __cplusplus
@@ -14,8 +15,12 @@ extern "C"{
 }
 #endif /* __cplusplus */
 
+#define LCDVIEW_CMD_BITMASK_PRINT	(0x80)
+#define LCDVIEW_CMD_BITMASK_ROW		(0x40)
+#define LCDVIEW_CMD_BITMASK_COL		(0x3F)
 
 #define LCDVIEW_CMD_UDP_PORT	(5001)
+
 
 // Class : LcdView Class
 // Input lcd view.
@@ -27,8 +32,10 @@ public:
 	LcdView( void );
 	
 private:
-	QPushButton	*m_ClearBtn;	// [CLR] Button
+	QLabel		*m_lcdLabel[2][20];	// LCD•\Ž¦ƒ‰ƒxƒ‹
 	QUdpSocket	*m_udpSocket;
+	QByteArray	m_rcvData;
+	quint8		m_needLength;
 
 	// Initalized keyview layout.
 	bool initLayout( void );
@@ -37,8 +44,6 @@ private:
 public slots:
 	// Udp data recieved slot.
 	void readPendingDatagrams( void );
-
-
 };
 
 #endif /* LCD_VIEW_HEADER */

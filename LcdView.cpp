@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QHostAddress>
+#include <QGridLayout>
 
 #include "LcdView.h"
 
@@ -32,49 +33,28 @@ bool LcdView::initLayout(void)
 {
 	bool ret = true;
 	
-	qDebug() << "Initialized key view layout.";
+	qDebug() << "Initialized lcd layout.";
 
-#if 0
-	QGridLayout	*mainLayout = new QGridLayout( this );
-	m_UpBtn		= new QPushButton( "[UP]", this );
-	m_LeftBtn	= new QPushButton( "[<L]", this );
-	m_RightBtn	= new QPushButton( "[R>]", this );
-	m_DownBtn	= new QPushButton( "[DOWN]", this );
-	QHBoxLayout	*lowerLayout = new QHBoxLayout( this );
-	m_EnterBtn	= new QPushButton( "ENT", this );
-	m_ClearBtn	= new QPushButton( "CLR", this );
-
-	// Layout keys.
-					//	row		column		height		width
-	mainLayout->addWidget( m_UpBtn,		0, 		1, 		1, 		2 );
-	mainLayout->addWidget( m_LeftBtn,	1, 		0, 		1, 		2 );
-	mainLayout->addWidget( m_RightBtn,	1, 		2, 		1, 		2 );
-	mainLayout->addWidget( m_DownBtn,	2, 		1, 		1, 		2 );
-
-	lowerLayout->addStretch();
-	lowerLayout->addWidget( m_EnterBtn );
-	lowerLayout->addWidget( m_ClearBtn );
-	mainLayout->addLayout( lowerLayout,	3,		0, 		1, 		4 );
-
-	// Regist key clicked event.
-	connect( m_UpBtn,		SIGNAL( pressed() ), this, SLOT( upPressed() ) );
-	connect( m_DownBtn,		SIGNAL( pressed() ), this, SLOT( downPressed() ) );
-	connect( m_LeftBtn,		SIGNAL( pressed() ), this, SLOT( leftPressed() ) );
-	connect( m_RightBtn,	SIGNAL( pressed() ), this, SLOT( rightPressed() ) );
-	connect( m_EnterBtn,	SIGNAL( pressed() ), this, SLOT( enterPressed() ) );
-	connect( m_ClearBtn,	SIGNAL( pressed() ), this, SLOT( clearPressed() ) );
-
-	// Regist key clicked event.
-	connect( m_UpBtn,		SIGNAL( released() ), this, SLOT( upReleased() ) );
-	connect( m_DownBtn,		SIGNAL( released() ), this, SLOT( downReleased() ) );
-	connect( m_LeftBtn,		SIGNAL( released() ), this, SLOT( leftReleased() ) );
-	connect( m_RightBtn,	SIGNAL( released() ), this, SLOT( rightReleased() ) );
-	connect( m_EnterBtn,	SIGNAL( released() ), this, SLOT( enterReleased() ) );
-	connect( m_ClearBtn,	SIGNAL( released() ), this, SLOT( clearReleased() ) );
+	QGridLayout	*lcdLayout = new QGridLayout( this );
+	for( qint32 rowNum = 0; rowNum < 2; rowNum++ ){
+		for( qint32 colNum = 0; colNum < 20; colNum++ ){
+			m_lcdLabel[rowNum][colNum]	= new QLabel( this );
+			m_lcdLabel[rowNum][colNum]->setMinimumWidth(12);
+			m_lcdLabel[rowNum][colNum]->setMinimumHeight(12);
+			m_lcdLabel[rowNum][colNum]->setFont( QFont( "Monospace" ) );
+			lcdLayout->addWidget(
+					m_lcdLabel[rowNum][colNum],
+					rowNum,		// row
+					colNum,		// column
+					1,		// height
+					1 );		// width
+		}
+	}
 
 	// Set layout to dialog( e.q LcdView ).
-	setLayout( mainLayout );
-#endif
+	setWindowTitle( "MS-8300TRX" );
+	setLayout( lcdLayout );
+
 	return ret;
 }
 
@@ -82,6 +62,8 @@ bool LcdView::initUdpSocket(void)
 {
 	bool ret = true;
 
+	m_needLength = 0;
+	m_rcvData.clear();
 	m_udpSocket = new QUdpSocket( this );
 	if( NULL == m_udpSocket ){
 		qDebug() << "Failed to initialized udp socket!" << endl;
@@ -102,6 +84,7 @@ void LcdView::readPendingDatagrams(void)
 
 	QByteArray	datagram;
 
+	// UDPから受信する
 	while( m_udpSocket->hasPendingDatagrams() ){
 		datagram.resize( m_udpSocket->pendingDatagramSize() );
 		QHostAddress	sender;
@@ -115,24 +98,32 @@ void LcdView::readPendingDatagrams(void)
 
 	}
 
+	quint8		code;		// 制御コード
+	quint8		colLen;		// 更新対象の文字列の長さ
+	quint8		rowNum = 0;	// 更新対象の行
+	quint8		colNum = 0;	// 更新対象の列(更新開始位置)
 
-	qint32		cmdLen;		// コマンドの長さ
-	qint8		code;		// 制御コード
-	QString		lcdL1Str;	// LCD1行目表示文字列
-	QString		lcdL2Str;	// LCD2行目表示文字列
-
-	cmdLen = datagram.length();
-	if( 2 > cmdLen ){
-		qDebug() << "Recieved data is too short !" << endl;
+	code = datagram.at( 0 );
+	// 表示指示でない場合は何もせず終了
+	if( 0 == (code & LCDVIEW_CMD_BITMASK_PRINT) ){
+		qDebug() << "Not support control code." << endl;
+		return;
 	}
-	QDataStream	in( &datagram, QIODevice::ReadOnly );
-	in >> code;
-	in >> lcdL1Str;
 
-//	switch( code ){
-//	case '8' :
-//	case '9' :
-//	}
-	
-	qDebug() << lcdL1Str;
+	// 更新対象の行位置を指定
+	rowNum = ( 0 == ( code & LCDVIEW_CMD_BITMASK_ROW ) ? 0x00 : 0x01 );
+	// 更新開始桁位置を指定
+	colNum = ( code & LCDVIEW_CMD_BITMASK_COL );
+
+	// 書き込み長さが表示エリア(幅20文字)までに収まるようにする
+	colLen = datagram.at( 1 );
+	if( 20 < ( colNum + colLen ) ){
+		colLen = 20 - colNum;
+	}
+	//printf("%d %d %d\n", rowNum, colNum, colLen );
+
+	// 表示エリアを更新
+	for( qint32 cnt = 0; cnt < colLen; cnt++ ){
+		m_lcdLabel[rowNum][colNum + cnt]->setText( QString( datagram.at( cnt + 2 ) ) );
+	}
 }

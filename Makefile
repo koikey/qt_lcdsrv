@@ -601,6 +601,9 @@ moc_LcdView.cpp: ../../Qt/5.4/gcc/include/QtWidgets/QDialog \
 		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
+		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
+		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
+		../../Qt/5.4/gcc/include/QtWidgets/qframe.h \
 		../../Qt/5.4/gcc/include/QtCore/QDebug \
 		LcdView.h
 	/home/mpf/Qt/5.4/gcc/bin/moc $(DEFINES) -I/home/mpf/Qt/5.4/gcc/mkspecs/linux-g++ -I/home/mpf/share/qt_lcdsrv -I/home/mpf/share/qt_lcdsrv -I/home/mpf/Qt/5.4/gcc/include -I/home/mpf/Qt/5.4/gcc/include/QtWidgets -I/home/mpf/Qt/5.4/gcc/include/QtGui -I/home/mpf/Qt/5.4/gcc/include/QtNetwork -I/home/mpf/Qt/5.4/gcc/include/QtCore LcdView.h -o moc_LcdView.cpp
@@ -734,7 +737,10 @@ main.o: main.cpp ../../Qt/5.4/gcc/include/QtWidgets/QApplication \
 		../../Qt/5.4/gcc/include/QtNetwork/QUdpSocket \
 		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
-		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h
+		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
+		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
+		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
+		../../Qt/5.4/gcc/include/QtWidgets/qframe.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 LcdView.o: LcdView.cpp ../../Qt/5.4/gcc/include/QtCore/QDebug \
@@ -849,11 +855,15 @@ LcdView.o: LcdView.cpp ../../Qt/5.4/gcc/include/QtCore/QDebug \
 		../../Qt/5.4/gcc/include/QtNetwork/QHostAddress \
 		../../Qt/5.4/gcc/include/QtNetwork/qhostaddress.h \
 		../../Qt/5.4/gcc/include/QtNetwork/qabstractsocket.h \
+		../../Qt/5.4/gcc/include/QtWidgets/QVBoxLayout \
 		LcdView.h \
 		../../Qt/5.4/gcc/include/QtWidgets/QDialog \
 		../../Qt/5.4/gcc/include/QtWidgets/qdialog.h \
 		../../Qt/5.4/gcc/include/QtNetwork/QUdpSocket \
-		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h
+		../../Qt/5.4/gcc/include/QtNetwork/qudpsocket.h \
+		../../Qt/5.4/gcc/include/QtWidgets/QLabel \
+		../../Qt/5.4/gcc/include/QtWidgets/qlabel.h \
+		../../Qt/5.4/gcc/include/QtWidgets/qframe.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LcdView.o LcdView.cpp
 
 moc_LcdView.o: moc_LcdView.cpp 
